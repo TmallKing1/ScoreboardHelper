@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "scoreboard-helper",
+  "version": "${version}",
+  "name": "ScoreboardHelper",
+  "description": "Provides a few extra functions to use Minecraft Scoreboard more easily.",
+  "authors": [
+    "xiaozhu_zhizui"
+  ],
+  "contact": {
+    "sources": "https://github.com/TmallKing1/ScoreboardHelper"
+  },
+  "icon": "assets/scoreboard-helper/icon.png",
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/scoreboard-helper"
+      }
+    }
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "top.pigest.scoreboardhelper.ScoreboardHelper"
+    ]
+  },
+  "mixins": [
+    "ScoreboardHelper.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric": "*",
+    "minecraft": "1.20.x"
+  }
+}

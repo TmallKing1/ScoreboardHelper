@@ -1,0 +1,8 @@
+{
+  "category.scoreboardHelper": "Scoreboard Helper",
+  "commands.sbhelper.invalidCount": "最大显示数量不能为负数",
+  "commands.sbhelper.success.setMaxCount": "已设置记分板侧边栏最大显示数量为 %s",
+  "key.scoreboardHelper.pageUp": "记分板侧边栏向上翻页",
+  "key.scoreboardHelper.pageDown": "记分板侧边栏向下翻页",
+  "key.scoreboardHelper.switchDisplay": "显示或隐藏记分板侧边栏"
+}

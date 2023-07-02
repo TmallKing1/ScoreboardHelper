@@ -1,0 +1,8 @@
+{
+  "category.scoreboardHelper": "Scoreboard Helper",
+  "commands.sbhelper.invalidCount": "The maximum count cannot be negative",
+  "commands.sbhelper.success.setMaxCount": "Set max display count of scoreboard sidebar to %s",
+  "key.scoreboardHelper.pageUp": "SB Sidebar Page Up",
+  "key.scoreboardHelper.pageDown": "SB Sidebar Page Down",
+  "key.scoreboardHelper.switchDisplay": "Show/Hide SB Sidebar"
+}
