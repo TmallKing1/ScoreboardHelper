@@ -1,7 +1,7 @@
 package top.pigest.scoreboardhelper.mixin;
 
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
     @Inject(method = "renderScoreboardSidebar", at = @At(value = "HEAD"), cancellable = true)
-    private void ij(DrawContext context, ScoreboardObjective objective, CallbackInfo ci) {
+    private void ij(MatrixStack matrices, ScoreboardObjective objective, CallbackInfo ci) {
         if(!Constants.SHOW) {
             ci.cancel();
         }
     }
 
     @ModifyVariable(method = "renderScoreboardSidebar", at = @At(value = "STORE"))
-    private Collection<ScoreboardPlayerScore> injected(Collection<ScoreboardPlayerScore> collection, DrawContext context, ScoreboardObjective objective) {
+    private Collection<ScoreboardPlayerScore> injected(Collection<ScoreboardPlayerScore> collection, MatrixStack matrices, ScoreboardObjective objective) {
         Scoreboard scoreboard = objective.getScoreboard();
         Collection<ScoreboardPlayerScore> collection1 = scoreboard.getAllPlayerScores(objective);
         List<ScoreboardPlayerScore> list = collection1.stream().filter((score) -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#")).collect(Collectors.toList());
