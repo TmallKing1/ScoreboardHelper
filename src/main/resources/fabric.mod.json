@@ -8,7 +8,9 @@
     "xiaozhu_zhizui"
   ],
   "contact": {
-    "sources": "https://github.com/TmallKing1/ScoreboardHelper"
+    "homepage": "https://www.pigest.top/2023/scoreboard-helper",
+    "sources": "https://github.com/TmallKing1/ScoreboardHelper",
+    "issues": "https://github.com/TmallKing1/ScoreboardHelper/issues"
   },
   "icon": "assets/scoreboard-helper/icon.png",
   "custom": {
@@ -23,6 +25,9 @@
   "entrypoints": {
     "client": [
       "top.pigest.scoreboardhelper.ScoreboardHelper"
+    ],
+    "modmenu": [
+      "top.pigest.scoreboardhelper.config.ModMenuApiImpl"
     ]
   },
   "mixins": [

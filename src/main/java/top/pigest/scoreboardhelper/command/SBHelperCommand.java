@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
+import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
 import top.pigest.scoreboardhelper.util.Constants;
 
 public class SBHelperCommand {
@@ -25,8 +26,9 @@ public class SBHelperCommand {
         if(count < 0) {
             throw INVALID_COUNT_EXCEPTION.create();
         }
-        Constants.MAX_DISPLAY_COUNT = count;
+        ScoreboardHelperConfig.INSTANCE.maxShowCount.setValue(count);
         source.sendFeedback(Text.translatable("commands.sbhelper.success.setMaxCount", count));
         return count;
     }
+
 }

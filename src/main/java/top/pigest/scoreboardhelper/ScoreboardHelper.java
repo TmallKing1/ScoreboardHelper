@@ -12,6 +12,8 @@ import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.scoreboard.Team;
 import org.lwjgl.glfw.GLFW;
 import top.pigest.scoreboardhelper.command.SBHelperCommand;
+import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
+import top.pigest.scoreboardhelper.config.ScoreboardHelperConfigScreen;
 import top.pigest.scoreboardhelper.util.Constants;
 
 import java.util.Collection;
@@ -35,7 +37,13 @@ public class ScoreboardHelper implements ClientModInitializer {
     private static final KeyBinding keyBindingSwitchDisplay = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.scoreboardHelper.switchDisplay",
             InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_RIGHT,
+            GLFW.GLFW_KEY_UNKNOWN,
+            "category.scoreboardHelper"
+    ));
+    private static final KeyBinding keyBindingOpenConfig = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.scoreboardHelper.openConfig",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_UNKNOWN,
             "category.scoreboardHelper"
     ));
     @Override
@@ -56,7 +64,7 @@ public class ScoreboardHelper implements ClientModInitializer {
                     }
                     scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
                     Collection<ScoreboardPlayerScore> collection = scoreboard.getAllPlayerScores(scoreboardObjective);
-                    if(collection.size() > Constants.PAGE + Constants.MAX_DISPLAY_COUNT) {
+                    if(collection.size() > Constants.PAGE + ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue()) {
                         Constants.PAGE++;
                     }
                 }
@@ -66,9 +74,12 @@ public class ScoreboardHelper implements ClientModInitializer {
             }
             if (keyBindingSwitchDisplay.isPressed()) {
                 if(Constants.CD == 0) {
-                    Constants.SHOW = !Constants.SHOW;
+                    ScoreboardHelperConfig.INSTANCE.scoreboardShown.setValue(!ScoreboardHelperConfig.INSTANCE.scoreboardShown.getValue());
                     Constants.CD = 5;
                 }
+            }
+            if (keyBindingOpenConfig.isPressed()) {
+                client.setScreen(new ScoreboardHelperConfigScreen(client.currentScreen, ScoreboardHelperConfig.INSTANCE));
             }
         });
     }
