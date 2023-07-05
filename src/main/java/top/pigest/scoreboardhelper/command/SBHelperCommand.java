@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
 import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
-import top.pigest.scoreboardhelper.util.Constants;
 
 public class SBHelperCommand {
     private static final SimpleCommandExceptionType INVALID_COUNT_EXCEPTION = new SimpleCommandExceptionType(Text.translatable("commands.sbhelper.invalidCount"));
