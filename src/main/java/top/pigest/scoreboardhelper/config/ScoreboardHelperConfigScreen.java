@@ -1,5 +1,6 @@
 package top.pigest.scoreboardhelper.config;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -52,6 +53,12 @@ public class ScoreboardHelperConfigScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        list.removeAll(list);
+        this.init(client, width, height);
+    }
+
     private static String getTranslationKey(String key, TranslationKeyType keyType) {
         switch (keyType) {
             case NORMAL -> {
@@ -76,7 +83,7 @@ public class ScoreboardHelperConfigScreen extends Screen {
 
     private TextFieldWidget createIntegerPropertyTextField(int x, int y, int width, int height, Property<Integer> property) {
         Text text = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.NORMAL));
-        list.add(new TextWithShadow(x, y - 15, text, 0xFFFFFF));
+        list.add(new TextWithShadow(x, y - 15, text, 0xA0A0A0));
         Text toolTip = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.TOOLTIP));
         TextFieldWidget widget = new TextFieldWidget(textRenderer, x, y, width, height, Text.literal(property.getKey()));
         widget.setTooltip(Tooltip.of(toolTip));
