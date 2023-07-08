@@ -1,5 +1,6 @@
 package top.pigest.scoreboardhelper.config;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -50,6 +51,12 @@ public class ScoreboardHelperConfigScreen extends Screen {
         }
         drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, 30, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
+    }
+
+    @Override
+    public void resize(MinecraftClient client, int width, int height) {
+        list.removeAll(list);
+        this.init(client, width, height);
     }
 
     private static String getTranslationKey(String key, TranslationKeyType keyType) {
