@@ -10,7 +10,6 @@ import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,7 +18,6 @@ import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
 import top.pigest.scoreboardhelper.util.Constants;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
