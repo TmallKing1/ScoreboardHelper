@@ -22,6 +22,35 @@ public class ScoreboardHelperConfig {
     public final Property.BooleanProperty scoreboardShown = addProperty(new Property.BooleanProperty("show_scoreboard", true));
     public final Property.BooleanProperty sidebarScoreShown = addProperty(new Property.BooleanProperty("show_sidebar_score", true));
     public final Property.IntegerProperty maxShowCount = addProperty(new Property.IntegerProperty("max_show_count", 15));
+    public final Property.BaseProperty<ScoreboardSidebarPosition> sidebarPosition = addProperty(new Property.BaseProperty<ScoreboardSidebarPosition>("sidebar_position", ScoreboardSidebarPosition.RIGHT) {
+        @Override
+        public JsonElement toJson() {
+            switch (this.getValue()) {
+                case LEFT -> {
+                    return new JsonPrimitive("left");
+                }
+                case RIGHT -> {
+                    return new JsonPrimitive("right");
+                }
+            }
+            return new JsonPrimitive("right");
+        }
+
+        @Override
+        public void fromJson(JsonElement jsonElement) {
+            if(jsonElement.isJsonPrimitive()) {
+                ScoreboardSidebarPosition value;
+                switch (jsonElement.getAsString()) {
+                    case "left" -> value = ScoreboardSidebarPosition.LEFT;
+                    case "right" -> value = ScoreboardSidebarPosition.RIGHT;
+                    default -> value = ScoreboardSidebarPosition.RIGHT;
+                }
+                setValue(value);
+            } else {
+                throw new JsonParseException("Json must be a primitive.");
+            }
+        }
+    });
 
     static {
         INSTANCE.load();
@@ -83,5 +112,23 @@ public class ScoreboardHelperConfig {
             LOGGER.warn("Property with key " + re.getKey() + " was overridden.");
         }
         return property;
+    }
+
+    public enum ScoreboardSidebarPosition {
+        LEFT,
+        RIGHT;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case LEFT -> {
+                    return "left";
+                }
+                case RIGHT -> {
+                    return "right";
+                }
+            }
+            return super.toString();
+        }
     }
 }

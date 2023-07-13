@@ -8,9 +8,13 @@
   "key.scoreboardHelper.switchDisplay": "Show/Hide SB Sidebar",
   "options.scoreboard-helper.title": "Scoreboard Helper Config",
   "options.scoreboard-helper.max_show_count": "Scoreboard Sidebar Max Display Count",
-  "options.scoreboard-helper.max_show_count.tooltip": "Control the number of player scores that can be displayed on the scoreboard sidebar each time\nDefault: 15",
+  "options.scoreboard-helper.max_show_count.tooltip": "Control the number of player scores that can be displayed on the scoreboard sidebar each time.\nDefault: 15",
   "options.scoreboard-helper.show_scoreboard": "Show Scoreboard",
-  "options.scoreboard-helper.show_scoreboard.tooltip": "Controls the show/hide of the scoreboard sidebar\nDefault: ON",
+  "options.scoreboard-helper.show_scoreboard.tooltip": "Controls the show/hide of the scoreboard sidebar.\nDefault: ON",
   "options.scoreboard-helper.show_sidebar_score": "Show Scoreboard Sidebar Score",
-  "options.scoreboard-helper.show_sidebar_score.tooltip": "Controls the show/hide of the players' score(red number) of the scoreboard sidebar\nDefault: ON"
+  "options.scoreboard-helper.show_sidebar_score.tooltip": "Controls the show/hide of the players' score(red number) of the scoreboard sidebar.\nDefault: ON",
+  "options.scoreboard-helper.sidebar_position": "Scoreboard Sidebar Position",
+  "options.scoreboard-helper.sidebar_position.tooltip": "Controls the position of the scoreboard sidebar.\nDefault: RIGHT",
+  "options.scoreboard-helper.sidebar_position.value.left": "LEFT",
+  "options.scoreboard-helper.sidebar_position.value.right": "RIGHT"
 }
