@@ -84,4 +84,33 @@ public interface Property<T> {
             }
         }
     }
+
+    class DoubleProperty extends BaseProperty<Double> {
+        private final int digits;
+
+        protected DoubleProperty(String key, Double defValue, int digits) {
+            super(key, defValue);
+            this.digits = digits;
+        }
+
+        @Override
+        public void setValue(Double value) {
+            double scale = Math.pow(10, digits);
+            super.setValue(Math.round(value * scale) / scale);
+        }
+
+        @Override
+        public JsonElement toJson() {
+            return new JsonPrimitive(getValue());
+        }
+
+        @Override
+        public void fromJson(JsonElement jsonElement) {
+            if(jsonElement.isJsonPrimitive()) {
+                setValue(jsonElement.getAsDouble());
+            } else {
+                throw new JsonParseException("Json must be a primitive.");
+            }
+        }
+    }
 }
