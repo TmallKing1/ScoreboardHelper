@@ -1,25 +1,19 @@
 package top.pigest.scoreboardhelper.config;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.option.SimpleOption;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import top.pigest.scoreboardhelper.gui.widget.PropertySliderWidget;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class ScoreboardHelperConfigScreen extends Screen {
     private final Screen parent;
     private final ScoreboardHelperConfig config;
-    private final List<TextWithShadow> list = new ArrayList<>();
     private final int TITLE_Y = 30;
 
     public ScoreboardHelperConfigScreen(Screen parent, ScoreboardHelperConfig config) {
@@ -30,10 +24,15 @@ public class ScoreboardHelperConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        addDrawableChild(createBooleanPropertyButton(width / 2 - 100, TITLE_Y + 40, 200, 20, config.scoreboardShown));
-        addDrawableChild(createBooleanPropertyButton(width / 2 - 100, TITLE_Y + 40 + 30, 200, 20, config.sidebarScoreShown));
-        addDrawableChild(createEnumPropertyButton(width / 2 - 100, TITLE_Y + 40 + 30 + 30, 200, 20, config.sidebarPosition, ScoreboardHelperConfig.ScoreboardSidebarPosition.values()));
-        addDrawableChild(createIntegerPropertyTextField( width / 2 - 100, TITLE_Y + 40 + 30 + 30 + 40, 200, 20, config.maxShowCount));
+        addDrawableChild(createBooleanPropertyButton(width / 2 - 10 - 200, TITLE_Y + 20, 200, 20, config.scoreboardShown));
+        addDrawableChild(createBooleanPropertyButton(width / 2 - 10 - 200, TITLE_Y + 20 + 30, 200, 20, config.sidebarScoreShown));
+        addDrawableChild(createEnumPropertyButton(width / 2 - 10 - 200, TITLE_Y + 20 + 30 * 2, 200, 20, config.sidebarPosition, ScoreboardHelperConfig.ScoreboardSidebarPosition.values()));
+        addDrawableChild(createIntegerPropertySlider( width / 2 - 10 - 200, TITLE_Y + 20 + 30 * 3, 200, 20, config.maxShowCount, 0, 100));
+        addDrawableChild(createIntegerPropertySlider( width / 2 - 10 - 200, TITLE_Y + 20 + 30 * 4, 200, 20, config.sidebarYOffset, -100, 100));
+        addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20, 200, 20, config.sidebarBackgroundOpacity, 0.0, 1.0));
+        addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30, 200, 20, config.sidebarBackgroundTitleOpacity, 0.0, 1.0));
+        addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30 * 2, 200, 20, config.sidebarTextOpacity, 0.1, 1.0));
+        addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30 * 3, 200, 20, config.sidebarTitleTextOpacity, 0.1, 1.0));
 
         addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).size(200, 20).position(width / 2 - 100, height - 40).build());
     }
@@ -51,17 +50,8 @@ public class ScoreboardHelperConfigScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context);
-        for(TextWithShadow text: list) {
-            context.drawTextWithShadow(textRenderer, text.text, text.x, text.y, text.color);
-        }
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, TITLE_Y, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
-    }
-
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        list.removeAll(list);
-        this.init(client, width, height);
     }
 
     private static String getTranslationKey(String key, TranslationKeyType keyType) {
@@ -99,26 +89,24 @@ public class ScoreboardHelperConfigScreen extends Screen {
         return positionCyclingButtonWidget;
     }
 
-    private TextFieldWidget createIntegerPropertyTextField(int x, int y, int width, int height, Property<Integer> property) {
+    private PropertySliderWidget<Integer> createIntegerPropertySlider(int x, int y, int width, int height, Property<Integer> property, int min, int max) {
         Text text = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.NORMAL));
-        list.add(new TextWithShadow(x, y - 15, text, 0xA0A0A0));
-        Text toolTip = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.TOOLTIP));
-        TextFieldWidget widget = new TextFieldWidget(textRenderer, x, y, width, height, Text.literal(property.getKey()));
-        widget.setTooltip(Tooltip.of(toolTip));
-        widget.setText(String.valueOf(property.getValue()));
-        widget.setChangedListener(s -> {
-            int k;
-            try {
-                k = Integer.parseInt(s);
-            } catch (NumberFormatException e) {
-                k = property.getDefaultValue();
-            }
-            property.setValue(k);
-        });
-        return widget;
+        Text tooltip = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.TOOLTIP));
+        int propertyValue = property.getValue();
+        double value = 1.0 * (propertyValue - min) / (max - min);
+        PropertySliderWidget<Integer> propertySliderWidget = new PropertySliderWidget<>(x, y, width, height, text, value, property, PropertySliderWidget.ValueTextGetter.getDefaultTextGetter(), PropertySliderWidget.PropertyValueApplier.getDefaultIntegerPropertyValueApplier(min, max));
+        propertySliderWidget.setTooltip(Tooltip.of(tooltip));
+        return propertySliderWidget;
     }
 
-    private record TextWithShadow(int x, int y, Text text, int color) {
+    private PropertySliderWidget<Double> createDoublePropertySlider(int x, int y, int width, int height, Property<Double> property, double min, double max) {
+        Text text = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.NORMAL));
+        Text tooltip = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.TOOLTIP));
+        double propertyValue = property.getValue();
+        double value = (propertyValue - min) / (max - min);
+        PropertySliderWidget<Double> propertySliderWidget = new PropertySliderWidget<>(x, y, width, height, text, value, property, PropertySliderWidget.ValueTextGetter.getDefaultPercentTextGetter(), PropertySliderWidget.PropertyValueApplier.getDefaultDoublePropertyValueApplier(min, max));
+        propertySliderWidget.setTooltip(Tooltip.of(tooltip));
+        return propertySliderWidget;
     }
 
     private enum TranslationKeyType {

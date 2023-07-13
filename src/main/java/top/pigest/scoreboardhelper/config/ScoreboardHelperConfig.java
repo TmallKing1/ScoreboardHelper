@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ScoreboardHelperConfig {
 
@@ -22,28 +21,25 @@ public class ScoreboardHelperConfig {
     public final Property.BooleanProperty scoreboardShown = addProperty(new Property.BooleanProperty("show_scoreboard", true));
     public final Property.BooleanProperty sidebarScoreShown = addProperty(new Property.BooleanProperty("show_sidebar_score", true));
     public final Property.IntegerProperty maxShowCount = addProperty(new Property.IntegerProperty("max_show_count", 15));
+    public final Property.IntegerProperty sidebarYOffset = addProperty(new Property.IntegerProperty("sidebar_y_offset", 0));
+    public final Property.DoubleProperty sidebarBackgroundOpacity = addProperty(new Property.DoubleProperty("sidebar_background_opacity", 0.3, 2));
+    public final Property.DoubleProperty sidebarBackgroundTitleOpacity = addProperty(new Property.DoubleProperty("sidebar_background_title_opacity", 0.4, 2));
+    public final Property.DoubleProperty sidebarTextOpacity = addProperty(new Property.DoubleProperty("sidebar_text_opacity", 1.0, 2));
+    public final Property.DoubleProperty sidebarTitleTextOpacity = addProperty(new Property.DoubleProperty("sidebar_title_text_opacity", 1.0, 2));
+
     public final Property.BaseProperty<ScoreboardSidebarPosition> sidebarPosition = addProperty(new Property.BaseProperty<ScoreboardSidebarPosition>("sidebar_position", ScoreboardSidebarPosition.RIGHT) {
         @Override
         public JsonElement toJson() {
-            switch (this.getValue()) {
-                case LEFT -> {
-                    return new JsonPrimitive("left");
-                }
-                case RIGHT -> {
-                    return new JsonPrimitive("right");
-                }
-            }
-            return new JsonPrimitive("right");
+            return new JsonPrimitive(this.getValue().toString());
         }
 
         @Override
         public void fromJson(JsonElement jsonElement) {
             if(jsonElement.isJsonPrimitive()) {
-                ScoreboardSidebarPosition value;
-                switch (jsonElement.getAsString()) {
-                    case "left" -> value = ScoreboardSidebarPosition.LEFT;
-                    case "right" -> value = ScoreboardSidebarPosition.RIGHT;
-                    default -> value = ScoreboardSidebarPosition.RIGHT;
+                ScoreboardSidebarPosition value = ScoreboardSidebarPosition.RIGHT;
+                Optional<ScoreboardSidebarPosition> optional = Arrays.stream(ScoreboardSidebarPosition.values()).filter(val -> val.toString().equals(jsonElement.getAsString())).findFirst();
+                if(optional.isPresent()) {
+                    value = optional.get();
                 }
                 setValue(value);
             } else {
@@ -116,7 +112,11 @@ public class ScoreboardHelperConfig {
 
     public enum ScoreboardSidebarPosition {
         LEFT,
-        RIGHT;
+        LEFT_UPPER_CORNER,
+        LEFT_LOWER_CORNER,
+        RIGHT,
+        RIGHT_UPPER_CORNER,
+        RIGHT_LOWER_CORNER;
 
         @Override
         public String toString() {
@@ -124,8 +124,20 @@ public class ScoreboardHelperConfig {
                 case LEFT -> {
                     return "left";
                 }
+                case LEFT_LOWER_CORNER -> {
+                    return "left_lower_corner";
+                }
+                case LEFT_UPPER_CORNER -> {
+                    return "left_upper_corner";
+                }
                 case RIGHT -> {
                     return "right";
+                }
+                case RIGHT_LOWER_CORNER -> {
+                    return "right_lower_corner";
+                }
+                case RIGHT_UPPER_CORNER -> {
+                    return "right_upper_corner";
                 }
             }
             return super.toString();

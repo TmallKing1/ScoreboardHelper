@@ -65,7 +65,6 @@ public interface Property<T> {
     }
 
     class IntegerProperty extends BaseProperty<Integer> {
-
         protected IntegerProperty(String key, Integer defValue) {
             super(key, defValue);
         }
@@ -79,6 +78,35 @@ public interface Property<T> {
         public void fromJson(JsonElement jsonElement) {
             if(jsonElement.isJsonPrimitive()) {
                 setValue(jsonElement.getAsInt());
+            } else {
+                throw new JsonParseException("Json must be a primitive.");
+            }
+        }
+    }
+
+    class DoubleProperty extends BaseProperty<Double> {
+        private final int digits;
+
+        protected DoubleProperty(String key, Double defValue, int digits) {
+            super(key, defValue);
+            this.digits = digits;
+        }
+
+        @Override
+        public void setValue(Double value) {
+            double scale = Math.pow(10, digits);
+            super.setValue(Math.round(value * scale) / scale);
+        }
+
+        @Override
+        public JsonElement toJson() {
+            return new JsonPrimitive(getValue());
+        }
+
+        @Override
+        public void fromJson(JsonElement jsonElement) {
+            if(jsonElement.isJsonPrimitive()) {
+                setValue(jsonElement.getAsDouble());
             } else {
                 throw new JsonParseException("Json must be a primitive.");
             }
