@@ -8,9 +8,13 @@
   "key.scoreboardHelper.switchDisplay": "显示/隐藏记分板侧边栏",
   "options.scoreboard-helper.title": "Scoreboard Helper 配置",
   "options.scoreboard-helper.max_show_count": "记分板侧边栏最大显示数",
-  "options.scoreboard-helper.max_show_count.tooltip": "控制记分板侧边栏每次能够显示的玩家分数的条数\n默认值：15",
+  "options.scoreboard-helper.max_show_count.tooltip": "控制记分板侧边栏每次能够显示的玩家分数的条数。\n默认值：15",
   "options.scoreboard-helper.show_scoreboard": "显示记分板侧边栏",
-  "options.scoreboard-helper.show_scoreboard.tooltip": "控制记分板侧边栏的显示/隐藏\n默认值：开",
+  "options.scoreboard-helper.show_scoreboard.tooltip": "控制记分板侧边栏的显示/隐藏。\n默认值：开",
   "options.scoreboard-helper.show_sidebar_score": "显示记分板分数",
-  "options.scoreboard-helper.show_sidebar_score.tooltip": "控制记分板侧边栏的玩家分数（红色数字）的显示/隐藏\n默认值：开"
+  "options.scoreboard-helper.show_sidebar_score.tooltip": "控制记分板侧边栏的玩家分数（红色数字）的显示/隐藏。\n默认值：开",
+  "options.scoreboard-helper.sidebar_position": "记分板侧边栏方位",
+  "options.scoreboard-helper.sidebar_position.tooltip": "控制记分板侧边栏的显示位置。\n默认值：右侧",
+  "options.scoreboard-helper.sidebar_position.value.left": "左侧",
+  "options.scoreboard-helper.sidebar_position.value.right": "右侧"
 }
