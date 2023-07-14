@@ -58,7 +58,7 @@ public abstract class InGameHudMixin {
         Collection<ScoreboardPlayerScore> collection1 = scoreboard.getAllPlayerScores(objective);
         List<ScoreboardPlayerScore> list = collection1.stream().filter((score) -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#")).collect(Collectors.toList());
         Collection<ScoreboardPlayerScore> collection2;
-        int p = collection1.size() - ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue() - Constants.PAGE;
+        int p = list.size() - ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue() - Constants.PAGE;
         if (p < 0) {
             p = 0;
         }
