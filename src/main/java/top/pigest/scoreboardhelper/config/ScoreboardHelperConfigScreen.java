@@ -8,6 +8,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import top.pigest.scoreboardhelper.gui.widget.PropertySliderWidget;
+import top.pigest.scoreboardhelper.util.TranslationKeyType;
 
 import java.util.Objects;
 
@@ -109,8 +110,4 @@ public class ScoreboardHelperConfigScreen extends Screen {
         return propertySliderWidget;
     }
 
-    private enum TranslationKeyType {
-        NORMAL,
-        TOOLTIP
-    }
 }

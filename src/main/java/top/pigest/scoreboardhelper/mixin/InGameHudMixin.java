@@ -63,8 +63,8 @@ public abstract class InGameHudMixin {
             p = 0;
         }
         int q = p + ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue();
-        if(q > collection1.size()) {
-            q = collection1.size();
+        if(q > list.size()) {
+            q = list.size();
         }
         collection2 = list.subList(p, q);
         this.collection = collection2;
