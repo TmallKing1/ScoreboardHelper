@@ -34,8 +34,13 @@ public class ScoreboardHelperConfigScreen extends Screen {
         addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30, 200, 20, config.sidebarBackgroundTitleOpacity, 0.0, 1.0));
         addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30 * 2, 200, 20, config.sidebarTextOpacity, 0.1, 1.0));
         addDrawableChild(createDoublePropertySlider(width / 2 + 10, TITLE_Y + 20 + 30 * 3, 200, 20, config.sidebarTitleTextOpacity, 0.1, 1.0));
+        addDrawableChild(createBooleanPropertyButton(width / 2 + 10, TITLE_Y + 20 + 30 * 4, 200, 20, config.defaultTeamChat));
 
-        addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).size(200, 20).position(width / 2 - 100, height - 40).build());
+        addDrawableChild(new ButtonWidget.Builder(Text.translatable(getTranslationKey("reset", TranslationKeyType.NORMAL)), button -> {
+            ScoreboardHelperConfig.INSTANCE.resetDefault();
+            this.clearAndInit();
+        }).size(200, 20).position(width / 2 + 10, height - 40).build());
+        addDrawableChild(new ButtonWidget.Builder(ScreenTexts.DONE, button -> close()).size(200, 20).position(width / 2 - 10 - 200, height - 40).build());
     }
 
     @Override
@@ -83,9 +88,7 @@ public class ScoreboardHelperConfigScreen extends Screen {
         Text tooltip = Text.translatable(getTranslationKey(property.getKey(), TranslationKeyType.TOOLTIP));
         CyclingButtonWidget<T> positionCyclingButtonWidget = CyclingButtonWidget.<T>builder(value -> Text.translatable(getTranslationKey(property.getKey(),
                 TranslationKeyType.NORMAL) + ".value." + value.toString())).values(values).initially(property.getValue())
-                .build(x, y, width, height, text, (button, value) -> {
-                    property.setValue(value);
-                });
+                .build(x, y, width, height, text, (button, value) -> property.setValue(value));
         positionCyclingButtonWidget.setTooltip(Tooltip.of(tooltip));
         return positionCyclingButtonWidget;
     }

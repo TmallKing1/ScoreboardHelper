@@ -26,6 +26,7 @@ public class ScoreboardHelperConfig {
     public final Property.DoubleProperty sidebarBackgroundTitleOpacity = addProperty(new Property.DoubleProperty("sidebar_background_title_opacity", 0.4, 2));
     public final Property.DoubleProperty sidebarTextOpacity = addProperty(new Property.DoubleProperty("sidebar_text_opacity", 1.0, 2));
     public final Property.DoubleProperty sidebarTitleTextOpacity = addProperty(new Property.DoubleProperty("sidebar_title_text_opacity", 1.0, 2));
+    public final Property.BooleanProperty defaultTeamChat = addProperty(new Property.BooleanProperty("default_team_chat", false));
 
     public final Property.BaseProperty<ScoreboardSidebarPosition> sidebarPosition = addProperty(new Property.BaseProperty<ScoreboardSidebarPosition>("sidebar_position", ScoreboardSidebarPosition.RIGHT) {
         @Override
@@ -100,6 +101,16 @@ public class ScoreboardHelperConfig {
             obj.add(entry.getKey(), entry.getValue().toJson());
         }
         return obj;
+    }
+
+    public void resetDefault() {
+        for (Map.Entry<String, Property<?>> entry: propertyMap.entrySet()) {
+            resetDefault(entry.getValue());
+        }
+    }
+
+    private <T> void resetDefault(Property<T> property) {
+        property.setValue(property.getDefaultValue());
     }
 
     private <T extends Property<?>> T addProperty(T property) {
