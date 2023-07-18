@@ -10,9 +10,6 @@ import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 import top.pigest.scoreboardhelper.command.SBHelperCommand;
 import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
@@ -91,22 +88,8 @@ public class ScoreboardHelper implements ClientModInitializer {
                 client.setScreen(new ScoreboardHelperConfigScreen(client.currentScreen, ScoreboardHelperConfig.INSTANCE));
             }
             if(keyBindingExportScoreboard.isPressed() && Constants.CD_EXPORT == 0) {
-                if (client != null && client.player != null) {
-                    Scoreboard scoreboard = client.player.getScoreboard();
-                    ScoreboardObjective scoreboardObjective = null;
-                    Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
-                    if (team != null) {
-                        if (team.getColor().getColorIndex() >= 0) {
-                            scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
-                        }
-                    }
-                    scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
-                    if(scoreboardObjective == null) {
-                        client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.inactive").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-                    } else {
-                        client.setScreen(new ScoreboardExportScreen(client.currentScreen));
-                    }
-                }
+                ScoreboardExportScreen.INSTANCE.setParent(client.currentScreen);
+                client.setScreen(ScoreboardExportScreen.INSTANCE);
                 Constants.CD_EXPORT = 5;
             }
         });
