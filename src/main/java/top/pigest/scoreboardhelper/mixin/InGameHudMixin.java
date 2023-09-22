@@ -30,18 +30,18 @@ public abstract class InGameHudMixin {
     @Shadow public abstract TextRenderer getTextRenderer();
 
     @Unique
-    private int j;
+    private int scoreboardHelper$j;
 
     @Unique
-    private Collection<ScoreboardPlayerScore> collection;
+    private Collection<ScoreboardPlayerScore> scoreboardHelper$collection;
 
     @Unique
-    private Text text;
+    private Text scoreboardHelper$text;
 
     @Inject(method = "renderScoreboardSidebar", at = @At(value = "TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void injected0(DrawContext context, ScoreboardObjective objective, CallbackInfo ci, Scoreboard scoreboard, Collection<ScoreboardPlayerScore> collection, List list, List<Pair<ScoreboardPlayerScore, MutableText>> list2, Text text, int i, int j) {
-        this.j = j;
-        this.text = text;
+    private void injected0(DrawContext context, ScoreboardObjective objective, CallbackInfo ci, Scoreboard scoreboard, Collection<ScoreboardPlayerScore> collection, List<ScoreboardPlayerScore> list, List<Pair<ScoreboardPlayerScore, MutableText>> list2, Text text, int i, int j) {
+        this.scoreboardHelper$j = j;
+        this.scoreboardHelper$text = text;
     }
 
 
@@ -67,7 +67,7 @@ public abstract class InGameHudMixin {
             q = list.size();
         }
         collection2 = list.subList(p, q);
-        this.collection = collection2;
+        this.scoreboardHelper$collection = collection2;
         return collection2;
     }
 
@@ -116,7 +116,7 @@ public abstract class InGameHudMixin {
     private int injected7(int u) {
         switch (ScoreboardHelperConfig.INSTANCE.sidebarPosition.getValue()) {
             case LEFT, LEFT_LOWER_CORNER, LEFT_UPPER_CORNER -> {
-                return 3 + j + 2;
+                return 3 + scoreboardHelper$j + 2;
             }
             case RIGHT, RIGHT_LOWER_CORNER, RIGHT_UPPER_CORNER -> {
                 return u;
@@ -130,7 +130,7 @@ public abstract class InGameHudMixin {
         int returnValue = m;
         switch (ScoreboardHelperConfig.INSTANCE.sidebarPosition.getValue()) {
             case RIGHT_LOWER_CORNER, LEFT_LOWER_CORNER -> returnValue = this.scaledHeight - 3;
-            case RIGHT_UPPER_CORNER, LEFT_UPPER_CORNER -> returnValue = 3 + this.getTextRenderer().fontHeight * (collection.size() + 1);
+            case RIGHT_UPPER_CORNER, LEFT_UPPER_CORNER -> returnValue = 3 + this.getTextRenderer().fontHeight * (scoreboardHelper$collection.size() + 1);
         }
         return returnValue;
     }
@@ -154,7 +154,7 @@ public abstract class InGameHudMixin {
     private void injected12(Args args) {
         Text text = args.get(1);
         int o;
-        if(text.equals(this.text)) {
+        if(text.equals(this.scoreboardHelper$text)) {
             o = (int) (ScoreboardHelperConfig.INSTANCE.sidebarTitleTextOpacity.getValue() * 256);
         } else {
             o = (int) (ScoreboardHelperConfig.INSTANCE.sidebarTextOpacity.getValue() * 256);

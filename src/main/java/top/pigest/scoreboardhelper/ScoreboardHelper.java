@@ -6,10 +6,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.ScoreboardPlayerScore;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.*;
 import org.lwjgl.glfw.GLFW;
 import top.pigest.scoreboardhelper.command.SBHelperCommand;
 import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
@@ -67,10 +64,10 @@ public class ScoreboardHelper implements ClientModInitializer {
                     Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
                     if (team != null) {
                         if (team.getColor().getColorIndex() >= 0) {
-                            scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
+                            scoreboardObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.fromFormatting(team.getColor()));
                         }
                     }
-                    scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
+                    scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) : scoreboardObjective;
                     Collection<ScoreboardPlayerScore> collection = scoreboard.getAllPlayerScores(scoreboardObjective);
                     if(collection.size() > Constants.PAGE + ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue()) {
                         Constants.PAGE++;

@@ -4,10 +4,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.ScoreboardPlayerScore;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.*;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -62,7 +59,7 @@ public class ScoreboardExportScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         this.scoreboardListWidget.render(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, TITLE_Y, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
@@ -88,10 +85,10 @@ public class ScoreboardExportScreen extends Screen {
             Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
             if (team != null) {
                 if (team.getColor().getColorIndex() >= 0) {
-                    scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
+                    scoreboardObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.fromFormatting(team.getColor()));
                 }
             }
-            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
+            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) : scoreboardObjective;
             if(scoreboardObjective == null) {
                 client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.inactive").setStyle(Style.EMPTY.withColor(Formatting.RED)));
                 return false;
@@ -118,10 +115,10 @@ public class ScoreboardExportScreen extends Screen {
             Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
             if (team != null) {
                 if (team.getColor().getColorIndex() >= 0) {
-                    scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
+                    scoreboardObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.fromFormatting(team.getColor()));
                 }
             }
-            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
+            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) : scoreboardObjective;
             if(scoreboardObjective == null) {
                 client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.inactive").setStyle(Style.EMPTY.withColor(Formatting.RED)));
             } else {
