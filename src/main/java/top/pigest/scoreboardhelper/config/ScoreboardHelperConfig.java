@@ -4,64 +4,52 @@ import com.google.gson.*;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
+import top.pigest.scoreboardhelper.config.property.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ScoreboardHelperConfig {
 
     private final File file;
-    private final Map<String, Property<?>> propertyMap = new HashMap<>();
+    private final List<Property<?>> properties = new ArrayList<>();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    public static ScoreboardHelperConfig INSTANCE = new ScoreboardHelperConfig(FabricLoader.getInstance().getConfigDir().resolve("scoreboard-helper.json").toFile());
+    public static final ScoreboardHelperConfig INSTANCE = new ScoreboardHelperConfig(FabricLoader.getInstance().getConfigDir().resolve("scoreboard-helper.json").toFile());
 
-    public final Property.BooleanProperty scoreboardShown = addProperty(new Property.BooleanProperty("show_scoreboard", true));
-    public final Property.BooleanProperty sidebarScoreShown = addProperty(new Property.BooleanProperty("show_sidebar_score", true));
-    public final Property.IntegerProperty maxShowCount = addProperty(new Property.IntegerProperty("max_show_count", 15));
-    public final Property.IntegerProperty sidebarYOffset = addProperty(new Property.IntegerProperty("sidebar_y_offset", 0));
-    public final Property.DoubleProperty sidebarBackgroundOpacity = addProperty(new Property.DoubleProperty("sidebar_background_opacity", 0.3, 2));
-    public final Property.DoubleProperty sidebarBackgroundTitleOpacity = addProperty(new Property.DoubleProperty("sidebar_background_title_opacity", 0.4, 2));
-    public final Property.DoubleProperty sidebarTextOpacity = addProperty(new Property.DoubleProperty("sidebar_text_opacity", 1.0, 2));
-    public final Property.DoubleProperty sidebarTitleTextOpacity = addProperty(new Property.DoubleProperty("sidebar_title_text_opacity", 1.0, 2));
-    public final Property.BooleanProperty defaultTeamChat = addProperty(new Property.BooleanProperty("default_team_chat", false));
-
-    public final Property.BaseProperty<ScoreboardSidebarPosition> sidebarPosition = addProperty(new Property.BaseProperty<ScoreboardSidebarPosition>("sidebar_position", ScoreboardSidebarPosition.RIGHT) {
-        @Override
-        public JsonElement toJson() {
-            return new JsonPrimitive(this.getValue().toString());
-        }
-
-        @Override
-        public void fromJson(JsonElement jsonElement) {
-            if(jsonElement.isJsonPrimitive()) {
-                ScoreboardSidebarPosition value = ScoreboardSidebarPosition.RIGHT;
-                Optional<ScoreboardSidebarPosition> optional = Arrays.stream(ScoreboardSidebarPosition.values()).filter(val -> val.toString().equals(jsonElement.getAsString())).findFirst();
-                if(optional.isPresent()) {
-                    value = optional.get();
-                }
-                setValue(value);
-            } else {
-                throw new JsonParseException("Json must be a primitive.");
-            }
-        }
-    });
-
-    static {
-        INSTANCE.load();
-    }
+    public final BooleanProperty scoreboardShown;
+    public final BooleanProperty sidebarScoreShown;
+    public final EnumProperty<ScoreSortingMethod> sortingMethod;
+    public final IntegerProperty maxShowCount;
+    public final EnumProperty<ScoreboardSidebarPosition> sidebarPosition;
+    public final IntegerProperty sidebarYOffset;
+    public final DoubleProperty sidebarBackgroundOpacity;
+    public final DoubleProperty sidebarBackgroundTitleOpacity;
+    public final DoubleProperty sidebarTextOpacity;
+    public final DoubleProperty sidebarTitleTextOpacity;
+    public final BooleanProperty defaultTeamChat;
 
     public ScoreboardHelperConfig(File file) {
         this.file = file;
+        scoreboardShown = addProperty(new BooleanProperty("show_scoreboard", true));
+        sidebarScoreShown = addProperty(new BooleanProperty("show_sidebar_score", true));
+        sortingMethod = addProperty(new EnumProperty<>("score_sorting_method", ScoreSortingMethod.BY_SCORE_DESC));
+        maxShowCount = addProperty(new IntegerProperty("max_show_count", 15, 0, 100));
+        sidebarPosition = addProperty(new EnumProperty<>("sidebar_position", ScoreboardSidebarPosition.RIGHT));
+        sidebarYOffset = addProperty(new IntegerProperty("sidebar_y_offset", 0, -100, 100));
+        sidebarBackgroundOpacity = addProperty(new DoubleProperty("sidebar_background_opacity", 0.3, 2, 0.0, 1.0));
+        sidebarBackgroundTitleOpacity = addProperty(new DoubleProperty("sidebar_background_title_opacity", 0.4, 2, 0.0, 1.0));
+        sidebarTextOpacity = addProperty(new DoubleProperty("sidebar_text_opacity", 1.0, 2, 0.1, 1.0));
+        sidebarTitleTextOpacity = addProperty(new DoubleProperty("sidebar_title_text_opacity", 1.0, 2, 0.1, 1.0));
+        defaultTeamChat = addProperty(new BooleanProperty("default_team_chat", false));
         load();
     }
 
     public void load() {
+        LOGGER.info("Loading Scoreboard Helper config from file '" + file.getAbsolutePath() + "'");
         if(file.exists()) {
             try (FileReader fileReader = new FileReader(file)) {
                 fromJson(JsonParser.parseReader(fileReader));
@@ -83,13 +71,13 @@ public class ScoreboardHelperConfig {
     private void fromJson(JsonElement jsonElement) {
         if(jsonElement.isJsonObject()) {
             JsonObject obj = jsonElement.getAsJsonObject();
-            for(Map.Entry<String, Property<?>> entry: propertyMap.entrySet()) {
-                JsonElement element = obj.get(entry.getKey());
+            for(Property<?> property: properties) {
+                JsonElement element = obj.get(property.getKey());
                 if(element != null) {
                     try {
-                        entry.getValue().fromJson(element);
+                        property.fromJson(element);
                     } catch (JsonParseException e) {
-                        LOGGER.error("Couldn't read property '" + entry.getKey() + "'", e);
+                        LOGGER.error("Couldn't read property '" + property.getKey() + "'", e);
                     }
                 }
             }
@@ -100,16 +88,14 @@ public class ScoreboardHelperConfig {
 
     private JsonElement toJson() {
         JsonObject obj = new JsonObject();
-        for(Map.Entry<String, Property<?>> entry: propertyMap.entrySet()) {
-            obj.add(entry.getKey(), entry.getValue().toJson());
+        for(Property<?> property: properties) {
+            obj.add(property.getKey(), property.toJson());
         }
         return obj;
     }
 
     public void resetDefault() {
-        for (Map.Entry<String, Property<?>> entry: propertyMap.entrySet()) {
-            resetDefault(entry.getValue());
-        }
+        properties.forEach(this::resetDefault);
     }
 
     private <T> void resetDefault(Property<T> property) {
@@ -117,44 +103,12 @@ public class ScoreboardHelperConfig {
     }
 
     private <T extends Property<?>> T addProperty(T property) {
-        Property<?> re = propertyMap.put(property.getKey(), property);
-        if(re != null) {
-            LOGGER.warn("Property with key " + re.getKey() + " was overridden.");
-        }
+        properties.add(property);
         return property;
     }
 
-    public enum ScoreboardSidebarPosition {
-        LEFT,
-        LEFT_UPPER_CORNER,
-        LEFT_LOWER_CORNER,
-        RIGHT,
-        RIGHT_UPPER_CORNER,
-        RIGHT_LOWER_CORNER;
-
-        @Override
-        public String toString() {
-            switch (this) {
-                case LEFT -> {
-                    return "left";
-                }
-                case LEFT_LOWER_CORNER -> {
-                    return "left_lower_corner";
-                }
-                case LEFT_UPPER_CORNER -> {
-                    return "left_upper_corner";
-                }
-                case RIGHT -> {
-                    return "right";
-                }
-                case RIGHT_LOWER_CORNER -> {
-                    return "right_lower_corner";
-                }
-                case RIGHT_UPPER_CORNER -> {
-                    return "right_upper_corner";
-                }
-            }
-            return super.toString();
-        }
+    public List<Property<?>> getProperties() {
+        return properties;
     }
+
 }

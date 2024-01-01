@@ -1,4 +1,4 @@
-package top.pigest.scoreboardhelper.util.export;
+package top.pigest.scoreboardhelper.gui.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
@@ -7,14 +7,15 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardPlayerScore;
-import net.minecraft.scoreboard.Team;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
-import top.pigest.scoreboardhelper.gui.widget.ScoreboardListWidget;
+import top.pigest.scoreboardhelper.ScoreboardHelper;
+import top.pigest.scoreboardhelper.gui.widget.ScoreboardExportListWidget;
+import top.pigest.scoreboardhelper.util.ScoreboardHelperUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,8 +28,8 @@ public class ScoreboardExportScreen extends Screen {
     public static final ScoreboardExportScreen INSTANCE = new ScoreboardExportScreen(null);
     private Screen parent;
     private final List<RecordEntry> entries = new ArrayList<>();
-    private ScoreboardListWidget scoreboardListWidget;
-    private final int TITLE_Y = 8;
+    private ScoreboardExportListWidget scoreboardExportListWidget;
+
     public ScoreboardExportScreen(Screen parent) {
         super(Text.translatable(getTranslationKey("title")));
         this.parent = parent;
@@ -40,8 +41,8 @@ public class ScoreboardExportScreen extends Screen {
 
     @Override
     protected void init() {
-        this.scoreboardListWidget = new ScoreboardListWidget(client, this);
-        addSelectableChild(this.scoreboardListWidget);
+        this.scoreboardExportListWidget = new ScoreboardExportListWidget(client, this);
+        addSelectableChild(this.scoreboardExportListWidget);
 
         addDrawableChild(new ButtonWidget.Builder(Text.translatable(getTranslationKey("record")), button -> {
             boolean returnVal = record();
@@ -62,10 +63,10 @@ public class ScoreboardExportScreen extends Screen {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        this.scoreboardListWidget.render(matrices, mouseX, mouseY, delta);
-        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, TITLE_Y, 0xFFFFFF);
+        this.scoreboardExportListWidget.render(matrices, mouseX, mouseY, delta);
         super.render(matrices, mouseX, mouseY, delta);
+        int TITLE_Y = 8;
+        drawCenteredTextWithShadow(matrices, textRenderer, title, width / 2, TITLE_Y, 0xFFFFFF);
     }
 
     @Override
@@ -84,14 +85,7 @@ public class ScoreboardExportScreen extends Screen {
     private boolean record() {
         if (client != null && client.player != null) {
             Scoreboard scoreboard = client.player.getScoreboard();
-            ScoreboardObjective scoreboardObjective = null;
-            Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
-            if (team != null) {
-                if (team.getColor().getColorIndex() >= 0) {
-                    scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
-                }
-            }
-            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
+            ScoreboardObjective scoreboardObjective = ScoreboardHelperUtils.getSidebarObjective(scoreboard, client.player);
             if(scoreboardObjective == null) {
                 client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.inactive").setStyle(Style.EMPTY.withColor(Formatting.RED)));
                 return false;
@@ -101,8 +95,7 @@ public class ScoreboardExportScreen extends Screen {
                 for(ScoreboardPlayerScore score: scores) {
                     entry.scores.add(new Pair<>(score.getPlayerName(), score.getScore()));
                 }
-                ScoreboardObjective finalScoreboardObjective = scoreboardObjective;
-                entries.removeIf(entry1 -> entry1.displayName.equals(finalScoreboardObjective.getDisplayName()));
+                entries.removeIf(entry1 -> entry1.displayName.equals(scoreboardObjective.getDisplayName()));
                 entries.add(entry);
                 this.refresh();
                 return true;
@@ -114,14 +107,7 @@ public class ScoreboardExportScreen extends Screen {
     private void tryExport() {
         if (client != null && client.player != null) {
             Scoreboard scoreboard = client.player.getScoreboard();
-            ScoreboardObjective scoreboardObjective = null;
-            Team team = scoreboard.getPlayerTeam(client.player.getEntityName());
-            if (team != null) {
-                if (team.getColor().getColorIndex() >= 0) {
-                    scoreboardObjective = scoreboard.getObjectiveForSlot(3 + team.getColor().getColorIndex());
-                }
-            }
-            scoreboardObjective = scoreboardObjective == null ? scoreboard.getObjectiveForSlot(1) : scoreboardObjective;
+            ScoreboardObjective scoreboardObjective = ScoreboardHelperUtils.getSidebarObjective(scoreboard, client.player);
             if(scoreboardObjective == null) {
                 client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.inactive").setStyle(Style.EMPTY.withColor(Formatting.RED)));
             } else {
@@ -141,7 +127,7 @@ public class ScoreboardExportScreen extends Screen {
             } catch (IOException e) {
                 if (client != null && client.player != null) {
                     client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.exception").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-                    e.printStackTrace();
+                    ScoreboardHelper.LOGGER.error("Failed to export scoreboard", e);
                 }
             }
         }
@@ -156,17 +142,21 @@ public class ScoreboardExportScreen extends Screen {
                 p.append(score.getPlayerName()).append(",").append(score.getScore()).append("\n");
             }
             writer.write(String.valueOf(p));
-            Text text = Text.literal(name).setStyle(Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
-            MutableText text1 = Text.translatable("hint.scoreboard-helper.export.success", text);
-            if (client != null) {
-                if (client.player != null) {
-                    client.player.sendMessage(text1);
-                }
-            }
+            sendSuccessMessage(name, file);
         } catch (IOException e) {
             if (client != null && client.player != null) {
                 client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.exception").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-                e.printStackTrace();
+                ScoreboardHelper.LOGGER.error("Failed to export scoreboard", e);
+            }
+        }
+    }
+
+    private void sendSuccessMessage(String name, File file) {
+        Text text = Text.literal(name).setStyle(Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
+        MutableText text1 = Text.translatable("hint.scoreboard-helper.export.success", text);
+        if (client != null) {
+            if (client.player != null) {
+                client.player.sendMessage(text1);
             }
         }
     }
@@ -205,28 +195,27 @@ public class ScoreboardExportScreen extends Screen {
                         Files.createDirectories(path);
                     } catch (IOException e) {
                         client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.exception").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-                        e.printStackTrace();
+                        ScoreboardHelper.LOGGER.error("Failed to export scoreboard", e);
                     }
                 }
                 try (FileWriter writer = new FileWriter(file)) {
                     for (String s: export){
                         writer.write(s + "\n");
                     }
-                    Text text = Text.literal(name).setStyle(Style.EMPTY.withUnderline(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath())));
-                    MutableText text1 = Text.translatable("hint.scoreboard-helper.export.success", text);
-                    if (client != null) {
-                        if (client.player != null) {
-                            client.player.sendMessage(text1);
-                        }
-                    }
+                    sendSuccessMessage(name, file);
                 } catch (IOException e) {
                     if (client != null && client.player != null) {
                         client.player.sendMessage(Text.translatable("hint.scoreboard-helper.export.fail.exception").setStyle(Style.EMPTY.withColor(Formatting.RED)));
-                        e.printStackTrace();
+                        ScoreboardHelper.LOGGER.error("Failed to export scoreboard", e);
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void renderBackground(MatrixStack matrices) {
+        renderBackgroundTexture(matrices);
     }
 
     public List<RecordEntry> getRecordEntries() {
@@ -235,7 +224,7 @@ public class ScoreboardExportScreen extends Screen {
 
     public static class RecordEntry {
         private final Text displayName;
-        public List<Pair<String, Integer>> scores = new ArrayList<>();
+        public final List<Pair<String, Integer>> scores = new ArrayList<>();
 
         public RecordEntry(Text displayName) {
             this.displayName = displayName;

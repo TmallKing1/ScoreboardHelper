@@ -3,7 +3,7 @@ package top.pigest.scoreboardhelper.gui.widget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
-import top.pigest.scoreboardhelper.config.Property;
+import top.pigest.scoreboardhelper.config.property.Property;
 
 public class PropertySliderWidget<T extends Number> extends SliderWidget {
     private final Text prefix;

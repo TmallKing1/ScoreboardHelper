@@ -29,5 +29,4 @@ public class SBHelperCommand {
         source.sendFeedback(Text.translatable("commands.sbhelper.success.setMaxCount", count));
         return count;
     }
-
 }
