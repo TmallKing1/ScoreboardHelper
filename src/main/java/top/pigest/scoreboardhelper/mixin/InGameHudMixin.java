@@ -20,6 +20,8 @@ import top.pigest.scoreboardhelper.config.ScoreboardHelperConfig;
 import top.pigest.scoreboardhelper.util.Constants;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +59,12 @@ public abstract class InGameHudMixin {
         Scoreboard scoreboard = objective.getScoreboard();
         Collection<ScoreboardPlayerScore> collection1 = scoreboard.getAllPlayerScores(objective);
         List<ScoreboardPlayerScore> list = collection1.stream().filter((score) -> score.getPlayerName() != null && !score.getPlayerName().startsWith("#")).collect(Collectors.toList());
+        switch (ScoreboardHelperConfig.INSTANCE.sortingMethod.getValue()) {
+            case BY_SCORE_DESC -> {}
+            case BY_SCORE_ASC -> Collections.reverse(list);
+            case BY_NAME_DESC -> list.sort(Comparator.comparing(ScoreboardPlayerScore::getPlayerName, String::compareToIgnoreCase));
+            case BY_NAME_ASC -> list.sort(Comparator.comparing(ScoreboardPlayerScore::getPlayerName, String::compareToIgnoreCase).reversed());
+        }
         Collection<ScoreboardPlayerScore> collection2;
         int p = list.size() - ScoreboardHelperConfig.INSTANCE.maxShowCount.getValue() - Constants.PAGE;
         if (p < 0) {
